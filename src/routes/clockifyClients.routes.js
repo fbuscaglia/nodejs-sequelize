@@ -1,6 +1,8 @@
 import { Router } from "express";
-import { getClients, getClient } from "../controllers/clockifyClient.controller.js";
-
+import {
+  getClients,
+  getClient,
+} from "../controllers/clockifyClient.controller.js";
 
 const router = Router();
 

@@ -1,6 +1,6 @@
 import { User } from "../models/User.js";
 import bcrypt from "bcrypt";
-// import { generarJWT } from "../helpers/jwt.js";
+import { generarJWT } from "../helpers/jwt.js";
 
 export async function createUser(req, res) {
   try {
@@ -22,19 +22,19 @@ export async function createUser(req, res) {
     await usuario.save();
 
     // Generar JWT
-    // const token = await generarJWT(usuario.email, usuario.name);
+    const token = await generarJWT(usuario.email, usuario.name);
 
     res.status(201).json({
       ok: true,
       email: usuario.email,
       name: usuario.name,
-      //   token,
+      token,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: "Por favor hable con el administradore",
+      msg: "Por favor hable con el administrador",
     });
   }
 }
@@ -93,4 +93,57 @@ export async function getUser(req, res) {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
+}
+
+export async function loginUsuario(req, res = response) {
+  const { email, password } = req.body;
+  
+  try {
+    let usuario = await User.findOne({ where: { email: email } });
+
+    if (!usuario) {
+      return res.status(400).json({
+        ok: false,
+        msg: "El usuario no existe con ese email",
+      });
+    }
+
+    // Confirmar los passwords
+    const validPassword = bcrypt.compareSync(password, usuario.password);
+
+    if (!validPassword) {
+      return res.status(400).json({
+        ok: false,
+        msg: "Password incorrecto",
+      });
+    }
+
+    // Generar JWT
+    const token = await generarJWT(usuario.id, usuario.name);
+
+    res.json({
+      ok: true,
+      uid: usuario.id,
+      name: usuario.name,
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Por favor hable con el administrador",
+    });
+  }
+};
+
+export async function revalidarToken(req, res = response) {
+  const { id, name } = req;
+
+  // Generar JWT
+  const token = await generarJWT(id, name);
+
+  res.json({
+    ok: true,
+    token,
+  });
 }

@@ -1,4 +1,4 @@
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export const generarJWT = (uid, name) => {
   return new Promise((resolve, reject) => {
@@ -6,7 +6,7 @@ export const generarJWT = (uid, name) => {
 
     jwt.sign(
       payload,
-      process.env.SECRET_JWT_SEED,
+      'Esto-Es-Una-Palbr@-Secretaqwejsad@asdljasdknapito',
       {
         expiresIn: "2h",
       },
